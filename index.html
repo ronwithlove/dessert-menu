@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>巧克力杯子蛋糕</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap">
+<style>
+/* VOICE: 手绘食谱卡，轻松可爱但留白克制
+   IDEA: 速写本里的一页：左边杯子在变化，右边卡片逐个念出食材
+   PICTURE: 抖动线条的杯子、掉落的食材、搅拌勺、微波炉、空气炸锅热浪
+   COLOUR and TYPE: 奶油底、草莓粉、珊瑚杯、巧克力棕；站酷快乐体做标题和动词
+   LAYOUT: 标题 → 场景 + 卡片（窄屏上下叠）→ 步骤条 → 控制 */
+:root{color-scheme:light dark;
+--bg:light-dark(#FFF8F0,#2A1B14);--card:light-dark(#FFFFFF,#36241B);
+--ink:light-dark(#3B2418,#FCEBDD);--soft:light-dark(#8A6A58,#C9AE9C);
+--line:light-dark(#E7D8C9,#523A2D);--pink:#E0607E;--pinkL:light-dark(#F9D3DD,#6A3044);
+--cup:#F0997B;--cupL:#F5C4B3;--b1:#F6DFA8;--b2:#7A4A32;--choc:#3B2418}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 -apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;overflow-x:clip}
+.wrap{max-width:920px;margin:0 auto;padding:clamp(22px,4vw,48px) max(4vw,16px) 28px}
+.disp{font-family:"ZCOOL KuaiLe","PingFang SC",sans-serif;font-weight:400;color:var(--pink);-webkit-text-stroke:1.6px var(--choc);paint-order:stroke fill;text-shadow:3px 3px 0 var(--choc);letter-spacing:.02em}
+h1{margin:0;text-align:center;font-size:clamp(32px,7vw,50px);line-height:1.1}
+.tag{text-align:center;color:var(--soft);font-size:18px;margin-top:10px}
+.stage{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(12px,3vw,36px);align-items:center;margin-top:clamp(14px,3vw,30px)}
+.scene{display:block;width:100%;height:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card{position:relative;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;background:var(--card);border:2.5px solid var(--choc);border-radius:12px;padding:18px 34px 16px;box-shadow:6px 6px 0 var(--pinkL);min-height:220px}
+.card .nav{position:absolute;top:0;bottom:0;width:30px;display:grid;place-items:center;font-size:26px;color:var(--soft);transition:background .2s,color .2s}
+.card .nl{left:0;border-radius:10px 0 0 10px}.card .nr{right:0;border-radius:0 10px 10px 0}
+.card .nav.hit{background:var(--pinkL);color:var(--pink)}
+.kick{font-size:13px;color:var(--pink);font-weight:600}
+.verb{font-size:clamp(44px,10vw,58px);line-height:1.1;margin:0 0 2px}
+.item{font-family:"ZCOOL KuaiLe","PingFang SC",sans-serif;font-size:clamp(30px,7.5vw,36px);line-height:1.25;margin-top:4px}
+.item .amt{color:var(--pink);white-space:nowrap;margin-left:.3em}
+.detail{font-size:20px;color:var(--soft);margin-top:6px}.detail:empty{display:none}
+.prog{display:flex;align-items:center;gap:10px;margin-top:14px}
+.track{flex:1;height:10px;border:2px solid var(--choc);border-radius:999px;overflow:hidden}
+.fill{height:100%;background:var(--pink);transition:width .5s}
+.prog span{font-size:18px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tip{margin-top:8px;font-size:18px;line-height:1.5;color:var(--soft)}
+.tip:empty{display:none}
+.pop{animation:pop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.steps{list-style:none;padding:0;margin:clamp(24px,4vw,40px) 0 0;display:flex;justify-content:space-between;position:relative}
+.steps::before{content:"";position:absolute;left:6%;right:6%;top:19px;height:2px;background:var(--line)}
+.steps li{position:relative;flex:1;text-align:center}
+.steps button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;font-size:16px;color:var(--soft);min-height:44px}
+.steps b{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--bg);font-family:"ZCOOL KuaiLe",sans-serif;font-size:18px;font-weight:400;transition:.3s}
+.steps .done b{border-color:var(--choc);color:var(--ink)}
+.steps .on button{color:var(--pink)}
+.steps .on b{border-color:var(--choc);background:var(--pink);color:#fff;transform:scale(1.1)}
+.steps button:focus-visible b{outline:3px solid var(--pink);outline-offset:2px}
+.ctl{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:22px}
+.tagrow{position:relative;display:flex;justify-content:center;align-items:center;min-height:44px}.cl-link.home-link{right:auto;left:0;padding:0 12px 0 2px}
+.cl-link{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;min-height:44px;padding:0 2px 0 12px;color:var(--pink);font-size:18px;font-weight:600;text-decoration:none;-webkit-tap-highlight-color:transparent}.cl-link[hidden]{display:none}.cl-link:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:6px}
+.pill{display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:999px;border:2px solid var(--choc);background:var(--card);color:var(--ink);text-decoration:none;font-size:18px;box-shadow:3px 3px 0 var(--pinkL)}
+.pill:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--pinkL)}
+.pill:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+#checklist{max-width:620px;margin:20px auto 0}
+.srv{margin-top:20px;padding:14px 16px 12px;background:var(--card);border:2.5px solid var(--choc);border-radius:12px;box-shadow:6px 6px 0 var(--pinkL)}
+.srv-top{display:flex;justify-content:space-between;align-items:baseline}
+.srv-l{font-family:"ZCOOL KuaiLe",sans-serif;font-size:24px;white-space:nowrap}
+#nOut{font-family:"ZCOOL KuaiLe",sans-serif;font-size:34px;color:var(--pink)}#nOut::after{content:" " attr(data-u);font-size:20px;color:var(--ink)}
+.cups{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;margin-top:8px;touch-action:none;cursor:pointer;padding:6px 0;border-radius:10px;user-select:none;-webkit-user-select:none}
+.cups:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.cups *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.cups svg{display:block;width:100%;height:auto;pointer-events:none}
+.cups .c path.body{fill:var(--bg);transition:fill .15s}.cups .c.on path.body{fill:var(--b2)}
+.cups .c text{font-size:13px;fill:var(--soft)}.cups .c.on text{fill:var(--ink);font-weight:700}
+.srv-h{margin:10px 2px 0;color:var(--soft);font-size:17px}
+.cl-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:22px}
+#checklist h2{margin:0;font-size:34px}#checklist h2.sm{font-size:28px;margin-top:30px}
+#cnt{font-size:18px;color:var(--soft);white-space:nowrap}
+.cl{list-style:none;margin:12px 0 0;padding:0;background:var(--card);border:2.5px solid var(--choc);border-radius:12px;box-shadow:6px 6px 0 var(--pinkL);overflow:hidden}
+.cl li+li{border-top:1.5px dashed var(--line)}
+.cl label{display:flex;align-items:center;gap:14px;padding:14px 18px;min-height:60px;cursor:pointer;font-size:21px}
+.cl input{appearance:none;-webkit-appearance:none;flex:none;width:30px;height:30px;margin:0;border:2.5px solid var(--choc);border-radius:8px;background:var(--bg);display:grid;place-items:center;cursor:pointer}
+.cl input:checked{background:#639922}
+.cl input:checked::after{content:"";width:8px;height:15px;border:solid #fff;border-width:0 3.5px 3.5px 0;transform:translateY(-2px) rotate(45deg)}
+.cl input:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.cl .nm{flex:1}.cl .am{color:var(--pink);font-weight:700;white-space:nowrap}
+.cl li.ok .nm,.cl li.ok .am{color:var(--soft);text-decoration:line-through}
+.notes{margin:12px 0 0;padding:16px 18px 16px 44px;background:var(--pinkL);border-radius:12px;font-size:19px;line-height:1.65}
+.notes li+li{margin-top:10px}.notes b{color:var(--pink)}
+.menu{display:grid;gap:18px;margin:28px auto 0;max-width:560px}
+.mcard{display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--card);border:2.5px solid var(--choc);border-radius:14px;box-shadow:6px 6px 0 var(--pinkL);color:var(--ink);text-decoration:none;-webkit-tap-highlight-color:transparent}
+.mcard:active{transform:translate(3px,3px);box-shadow:3px 3px 0 var(--pinkL)}
+.mcard:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+.mcard svg{width:78px;flex:none}.mcard>div{flex:1}
+.mt{font-family:"ZCOOL KuaiLe",sans-serif;font-size:23px;white-space:nowrap;line-height:1.2}.ms{color:var(--soft);font-size:16px;margin-top:4px}
+.ma{font-size:30px;color:var(--pink)}
+.more{text-align:center;color:var(--soft);font-size:16px;margin-top:26px}
+.cups .ck circle.body{fill:var(--bg);transition:fill .15s}.cups .ck.on circle.body{fill:#D9A15E}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.ctl button{font:inherit;font-size:18px;min-height:44px;min-width:44px;padding:0 18px;border-radius:999px;border:2px solid var(--choc);background:var(--card);color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--pinkL)}
+.ctl button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--pinkL)}
+.ctl button:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+#play{background:var(--pink);color:#fff}
+@media(max-width:640px){.stage{grid-template-columns:minmax(0,1fr)}.card{min-height:0}.steps span{font-size:15px}.steps b{width:34px;height:34px;font-size:16px}.steps::before{top:17px}}
+/* scene */
+.cupg,.bat,.dome,.fade{transition:transform .9s cubic-bezier(.5,0,.2,1),opacity .6s,fill .9s}
+.bat,.dome{transform-box:fill-box;transform-origin:50% 100%}
+.item{transition:opacity .5s}
+.egg .ht,.egg .hb{transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.egg .shell{opacity:0}.egg.open .whole,.egg.used .whole{opacity:0}.egg.open .shell,.egg.used .shell{opacity:1}
+.egg.open .ht{transform:translate(-8px,-14px) rotate(-40deg)}.egg.open .hb{transform:translate(5px,5px) rotate(18deg)}
+.egg.used .ht{transform:translate(11px,8px) rotate(180deg)}.egg.used .hb{transform:translate(-10px,2px) rotate(-10deg)}
+.item .art{transition:opacity .5s}.item.used:not(.egg) .art{opacity:.4}
+.item .chk{opacity:0;transition:opacity .4s}.item.used .chk{opacity:1}
+.tag.done{fill:#3B6D11}
+.surfg{transition:transform .9s cubic-bezier(.5,0,.2,1),opacity .4s}
+#surfE{transition:fill .8s,rx .9s}
+.dep{transition:opacity .7s}.dep.gone{opacity:0}
+.dep.new{animation:depIn .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes depIn{from{transform:scale(.2);opacity:0}}
+.dep{transform-box:fill-box;transform-origin:50% 100%}
+.liq{transform-box:fill-box;transform-origin:50% 0}
+.stir{transform-box:view-box;transform-origin:204px 160px;animation:stir 1.1s linear infinite}
+@keyframes stir{0%{transform:translate(-22px,0) rotate(-9deg)}12.5%{transform:translate(-15px,4px) rotate(-6deg)}25%{transform:translate(0,6px) rotate(0)}37.5%{transform:translate(15px,4px) rotate(6deg)}50%{transform:translate(22px,0) rotate(9deg)}62.5%{transform:translate(15px,-4px) rotate(6deg)}75%{transform:translate(0,-6px) rotate(0)}87.5%{transform:translate(-15px,-4px) rotate(-6deg)}100%{transform:translate(-22px,0) rotate(-9deg)}}
+.ringE{animation:ring 1.1s linear infinite}@keyframes ring{to{stroke-dashoffset:104}}
+.bub{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.tag{font-size:17px;font-weight:600;fill:var(--ink);transition:fill .3s}.tag.on{fill:var(--pink);font-weight:800}
+.wave{animation:wv 1.4s ease-in-out infinite}
+@keyframes wv{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-6px);opacity:1}}
+.glow{animation:gl 1.1s ease-in-out infinite alternate}
+@keyframes gl{from{opacity:.3}to{opacity:.75}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+  <section id="menu" hidden>
+    <h1 class="disp">甜点菜单</h1>
+    <div class="tag">选一个开始做</div>
+    <div class="menu">
+      <a class="mcard" href="#cake">
+        <svg viewBox="0 0 120 100" aria-hidden="true"><path d="M86 42 Q104 42 102 58 Q100 72 82 70" fill="none" stroke="#3B2418" stroke-width="3"/><path d="M28 38 L88 38 L83 92 Q58 97 33 92 Z" fill="#FDE9DF" stroke="#3B2418" stroke-width="3" stroke-linejoin="round"/><path d="M30 38 Q32 12 58 10 Q84 12 86 38 Z" fill="#7A4A32" stroke="#3B2418" stroke-width="3"/><rect x="48" y="20" width="7" height="7" rx="1.5" fill="#2A170E"/><rect x="64" y="25" width="6" height="6" rx="1.5" fill="#2A170E"/><path d="M44 6 q4 -5 0 -10M70 6 q4 -5 0 -10" stroke="#8A6A58" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+        <div><div class="mt">巧克力杯子蛋糕</div><div class="ms">微波炉 · 约 5 分钟 · 1–8 杯</div></div><span class="ma">›</span>
+      </a>
+      <a class="mcard" href="#cookie">
+        <svg viewBox="0 0 120 100" aria-hidden="true"><ellipse cx="60" cy="58" rx="46" ry="34" fill="#D9A15E" stroke="#3B2418" stroke-width="3"/><ellipse cx="56" cy="54" rx="30" ry="20" fill="#E8BB78"/><rect x="38" y="44" width="11" height="11" rx="2" fill="#2A170E" transform="rotate(14 43 49)"/><rect x="66" y="40" width="12" height="12" rx="2" fill="#2A170E" transform="rotate(-10 72 46)"/><rect x="56" y="66" width="10" height="10" rx="2" fill="#2A170E" transform="rotate(25 61 71)"/><rect x="80" y="62" width="8" height="8" rx="2" fill="#2A170E"/><path d="M30 70 q8 4 14 0M74 30 q6 4 12 2" stroke="#B57A3E" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+        <div><div class="mt">巧克力 Cookie</div><div class="ms">空气炸锅 · 2–8 块</div></div><span class="ma">›</span>
+      </a>
+    </div>
+    <p class="more">更多甜点，敬请期待</p>
+  </section>
+  <div id="recipe">
+  <h1 class="disp" id="rTitle">巧克力杯子蛋糕</h1>
+  <div class="tag tagrow"><a class="cl-link home-link" id="homeBtn" href="#">‹ 菜单</a><span id="tagline">1 杯 · 微波炉</span><a class="cl-link topbtn" id="clBtn" href="#cake-list">清单 ›</a></div>
+  <div id="anim">
+
+  <div class="stage">
+    <svg class="scene" id="scene" viewBox="0 0 420 266" role="img" aria-labelledby="scT">
+      <title id="scT">杯子蛋糕制作动画，点击可重播当前动作</title>
+      <defs>
+        <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter>
+        <clipPath id="bowlClip" clipPathUnits="userSpaceOnUse"><ellipse cx="0" cy="-40" rx="72" ry="13.5"/></clipPath>
+        <clipPath id="cupClip" clipPathUnits="userSpaceOnUse"><path d="M-48 -62 L48 -62 L40 58 Q0 66 -40 58 Z"/></clipPath>
+        <g id="cupBody">
+          <path d="M48 -30 Q76 -28 72 0 Q68 24 42 22" fill="none" stroke="var(--choc)" stroke-width="2.4"/>
+          <path d="M-48 -62 L48 -62 L40 58 Q0 66 -40 58 Z" fill="#FDE9DF" stroke="var(--choc)" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M-36 -50 L-31 40" stroke="var(--cup)" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+        </g>
+      </defs>
+      <g filter="url(#rough)">
+        <path d="M14 234 Q210 229 412 234" fill="none" stroke="var(--line)" stroke-width="2"/>
+        <g transform="translate(30 0)">
+
+        <g class="fade" id="mw" opacity="0">
+          <rect x="34" y="88" width="196" height="144" rx="14" fill="var(--card)" stroke="var(--choc)" stroke-width="2.4"/>
+          <rect x="46" y="100" width="132" height="120" rx="8" fill="#FAC775" class="glow"/>
+          <rect x="46" y="100" width="132" height="120" rx="8" fill="none" stroke="var(--choc)" stroke-width="1.8"/>
+          <rect x="186" y="104" width="36" height="20" rx="4" fill="var(--choc)"/>
+          <text id="timer" x="204" y="118" text-anchor="middle" font-size="12" fill="#FAC775">90</text>
+          <circle cx="204" cy="148" r="7" fill="none" stroke="var(--choc)" stroke-width="1.8"/>
+          <circle cx="204" cy="172" r="7" fill="none" stroke="var(--choc)" stroke-width="1.8"/>
+        </g>
+
+        </g>
+        <g class="fade" id="spoon" opacity="0"><g class="stir">
+          <path d="M226 30 L204 160" stroke="var(--choc)" stroke-width="7" stroke-linecap="round"/>
+          <path d="M226 30 L204 160" stroke="#D3D1C7" stroke-width="3.5" stroke-linecap="round"/>
+        </g></g>
+        <g id="streams"></g>
+        <g transform="translate(30 0)">
+        <g class="fade" id="bowlG" opacity="0" transform="translate(170 198)">
+          <ellipse cx="0" cy="34" rx="56" ry="6" fill="var(--line)" opacity=".7"/>
+          <ellipse cx="0" cy="-40" rx="74" ry="15" fill="#EADCC8" stroke="var(--choc)" stroke-width="2.4"/>
+          <g clip-path="url(#bowlClip)"><g class="surfg" id="bSurf" opacity="0"><ellipse id="bSurfE" rx="72" ry="13" fill="#F6DFA8" stroke="#D9BE86" stroke-width="1.4"/><g id="bDeps" transform="scale(1.6 1.15)"></g>
+            <g class="fade" id="bSwirl" opacity="0"><g transform="scale(1.5 .3)"><g><animateTransform attributeName="transform" type="rotate" from="0" to="-360" dur="1.1s" repeatCount="indefinite"/><path id="bSwirlP" d="M0 0 m-34 0 a34 34 0 1 1 68 0 a28 28 0 1 1 -56 0 a22 22 0 1 1 44 0 a16 16 0 1 1 -32 0 a10 10 0 1 1 20 0" fill="none" stroke="#D9B46A" stroke-width="5" stroke-linecap="round"/></g></g></g></g></g>
+          <path d="M-74 -40 Q-72 34 0 36 Q72 34 74 -40 A74 15 0 0 1 -74 -40 Z" fill="#F7EFE3" stroke="var(--choc)" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M-60 -18 Q-50 14 -24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+          <g fill="#C9B79C"><circle cx="-30" cy="-6" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="40" cy="-10" r="2"/><circle cx="-6" cy="18" r="2"/><circle cx="30" cy="16" r="2"/><circle cx="-48" cy="10" r="2"/></g>
+          <g class="fade" id="wrapF" opacity="0"><ellipse cx="0" cy="-42" rx="80" ry="17" fill="#E6F1FB" fill-opacity=".55" stroke="#85B7EB" stroke-width="2"/><path d="M-40 -48 Q-10 -54 20 -50" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+        </g>
+        <g class="cupg" id="cupA" style="transform:translate(170px,172px)">
+          <use href="#cupBody"/>
+          <g clip-path="url(#cupClip)"><rect class="bat" id="batA" x="-55" y="-62" width="110" height="126" fill="var(--b1)" style="transform:scaleY(0)"/>
+            <g class="surfg" id="surf" opacity="0"><ellipse id="surfE" rx="44" ry="8" fill="#F6DFA8" stroke="#D9BE86" stroke-width="1.4"/><g id="deps" transform="scale(1.2 1.25)"></g></g>
+            <g class="fade" id="swirl" opacity="0"><g id="swirlY"><g transform="scale(1 .3)"><g><animateTransform attributeName="transform" type="rotate" from="0" to="-360" dur="1.1s" repeatCount="indefinite"/><path id="swirlP" d="M0 0 m-34 0 a34 34 0 1 1 68 0 a28 28 0 1 1 -56 0 a22 22 0 1 1 44 0 a16 16 0 1 1 -32 0 a10 10 0 1 1 20 0" fill="none" stroke="#E2B864" stroke-width="5" stroke-linecap="round"/></g></g></g></g></g>
+          <path class="dome" id="domeA" d="M-48 -62 Q-46 -96 0 -98 Q46 -96 48 -62 Z" fill="var(--b2)" stroke="var(--choc)" stroke-width="2.2" style="transform:scaleY(0)"/>
+          <g class="fade" id="chipsA" opacity="0"><rect x="-26" y="-4" width="9" height="9" rx="2" fill="var(--choc)" transform="rotate(12 -22 0)"/><rect x="10" y="6" width="8" height="8" rx="2" fill="var(--choc)" transform="rotate(-18 14 10)"/><rect x="-6" y="22" width="9" height="9" rx="2" fill="var(--choc)"/><rect x="22" y="-12" width="7" height="7" rx="2" fill="var(--choc)"/></g>
+          <line class="fade" id="halfA" x1="-44" y1="-2" x2="44" y2="-2" stroke="var(--pink)" stroke-width="2.4" stroke-dasharray="6 4" opacity="0"/>
+          <path class="fade" id="crustA" d="M-40 -74 Q0 -92 40 -74" fill="none" stroke="#2A170E" stroke-width="5" stroke-linecap="round" opacity="0"/>
+          <rect x="-49" y="-66" width="98" height="7" rx="3.5" fill="var(--cupL)" stroke="var(--choc)" stroke-width="2.2"/>
+        <g class="fade" id="htA" opacity="0" fill="none" stroke="#EF9F27" stroke-width="3" stroke-linecap="round"><path class="wave" d="M-22 -104 q6 -8 0 -16 q-6 -8 0 -16"/><path class="wave" style="animation-delay:.4s" d="M18 -100 q6 -8 0 -16 q-6 -8 0 -16"/></g><g class="fade" id="smA" opacity="0" fill="none" stroke="var(--soft)" stroke-width="2.6" stroke-linecap="round"><path class="wave" d="M-10 -104 q5 -7 0 -14 q-5 -7 0 -14"/><path class="wave" style="animation-delay:.5s" d="M14 -108 q5 -7 0 -14 q-5 -7 0 -14"/></g></g>
+
+        <g id="extraCups"></g>
+        <g class="fade" id="steam" opacity="0" fill="none" stroke="var(--soft)" stroke-width="2.2" stroke-linecap="round">
+          <path class="wave" d="M100 56 q5 -7 0 -14 q-5 -7 0 -14"/>
+          <path class="wave" style="animation-delay:.5s" d="M232 56 q5 -7 0 -14 q-5 -7 0 -14"/>
+        </g>
+        </g>
+        <g class="fade" id="fryG" opacity="0">
+          <rect x="26" y="112" width="368" height="126" rx="20" fill="var(--card)" stroke="var(--choc)" stroke-width="2.4"/>
+          <rect x="40" y="140" width="340" height="90" rx="10" fill="#FAC775" class="glow"/>
+          <rect x="40" y="140" width="340" height="90" rx="10" fill="none" stroke="var(--choc)" stroke-width="1.8"/>
+          <rect x="44" y="214" width="332" height="10" rx="3" fill="#FFFDF5" stroke="#D9CDB6" stroke-width="1.4"/>
+          <rect x="160" y="118" width="100" height="18" rx="5" fill="var(--choc)"/>
+          <text id="fryT" x="210" y="131" text-anchor="middle" font-size="12" fill="#FAC775">320°F · 12:00</text>
+        </g>
+        <path class="fade" id="parch" opacity="0" d="M40 226 L380 226 L376 233 L44 233 Z" fill="#FFFDF5" stroke="#D9CDB6" stroke-width="1.6"/>
+        <g id="balls"></g>
+        <g class="fade" id="snow" opacity="0" fill="none" stroke="#85B7EB" stroke-width="2.4" stroke-linecap="round">
+          <g class="wave"><path d="M100 120 v20 M90 130 h20 M93 123 l14 14 M107 123 l-14 14"/></g>
+          <g class="wave" style="animation-delay:.5s"><path d="M318 108 v16 M310 116 h16 M312 110 l12 12 M324 110 l-12 12"/></g>
+        </g>
+        <g id="shelf"></g>
+        <g id="tags"></g>
+        <g class="fade" id="ring" opacity="0" fill="none" stroke="var(--pink)" stroke-width="3" stroke-linecap="round">
+          <ellipse class="ringE" cx="200" cy="100" rx="66" ry="13" stroke-dasharray="70 34"/>
+        </g>
+        <g id="bubble" opacity="0"></g>
+      </g>
+    </svg>
+
+    <div class="card" id="card" aria-live="polite" title="点左半边上一个，点右半边下一个">
+      <span class="nav nl" aria-hidden="true">‹</span><span class="nav nr" aria-hidden="true">›</span>
+            <div class="verb disp" id="verb"></div>
+      <div class="item" id="item"></div>
+      <div class="detail" id="detail"></div>
+      <div class="prog"><div class="track"><div class="fill" id="fill"></div></div><span id="frac"></span></div>
+      <div class="tip" id="tip"></div>
+    </div>
+  </div>
+
+  <ol class="steps" id="steps"></ol>
+  </div>
+  <section id="checklist" hidden>
+    <a class="pill back backAnim" href="#cake">‹ 返回动画</a>
+    <div class="srv">
+      <div class="srv-top"><span class="srv-l" id="srvL">做几杯？</span><output id="nOut" data-u="杯">1</output></div>
+      <div class="cups" id="cupBar" role="slider" tabindex="0" aria-label="杯数" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1"></div>
+    </div>
+    <p class="srv-h" id="srvH">在杯子上点一下或左右滑动选杯数。一杯是一份，用量会自动换算。</p>
+    <div class="cl-head"><h2 class="disp">食材清单</h2><span id="cnt"></span></div>
+    <ul class="cl" id="clIng"></ul>
+    <h2 class="disp sm">工具</h2>
+    <ul class="cl" id="clTool"></ul>
+    <h2 class="disp sm">备注</h2>
+    <ol class="notes" id="notes"></ol>
+    <div class="ctl"><button id="clReset">清空勾选</button><a class="pill backAnim" href="#cake">返回动画</a></div>
+  </section>
+  </div>
+</div>
+
+<script>
+{
+const INK='#3B2418';
+const ART={
+ egg:`<g class="whole"><ellipse rx="13" ry="16" fill="#fff" stroke="${INK}" stroke-width="2.2"/><path d="M-5 -9 Q-2 -12 2 -12" stroke="${INK}" stroke-opacity=".3" stroke-width="1.6" fill="none"/></g>
+  <g class="shell"><g class="hb"><path d="M-13 0 L-8 -4 L-4 0 L0 -4 L4 0 L8 -4 L13 0 A13 16 0 0 1 -13 0 Z" fill="#fff" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></g>
+  <g class="ht"><path d="M-13 0 L-8 -4 L-4 0 L0 -4 L4 0 L8 -4 L13 0 A13 16 0 0 0 -13 0 Z" fill="#fff" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></g></g>`,
+ sugar:`<path d="M-16 -20 L16 -20 L18 22 L-18 22 Z" fill="#fff" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><path d="M-16 -13 L16 -13" stroke="${INK}" stroke-width="1.5"/><text y="8" text-anchor="middle" font-size="13" fill="${INK}">白糖</text>`,
+ milk:`<path d="M-13 -10 L0 -24 L13 -10 L13 24 L-13 24 Z" fill="#E6F1FB" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><path d="M-13 -10 L13 -10" stroke="${INK}" stroke-width="1.5"/><rect x="-12" y="0" width="24" height="12" fill="#378ADD"/><text y="10" text-anchor="middle" font-size="9" fill="#fff">牛奶</text>`,
+ flour:`<path d="M-17 -18 Q0 -26 17 -18 L19 22 L-19 22 Z" fill="#FFFDF5" stroke="${INK}" stroke-width="2.2"/><text y="8" text-anchor="middle" font-size="12" fill="${INK}">面粉</text>`,
+ starch:`<path d="M-15 -16 Q0 -23 15 -16 L16 20 L-16 20 Z" fill="#FAEEDA" stroke="${INK}" stroke-width="2.2"/><text y="7" text-anchor="middle" font-size="11" fill="${INK}">淀粉</text>`,
+ cocoa:`<rect x="-14" y="-20" width="28" height="40" rx="4" fill="#7A4A32" stroke="${INK}" stroke-width="2.2"/><rect x="-14" y="-20" width="28" height="9" rx="3" fill="#E0607E" stroke="${INK}" stroke-width="1.5"/><text y="9" text-anchor="middle" font-size="11" fill="#FFF6EC">可可</text>`,
+ bp:`<rect x="-11" y="-14" width="22" height="30" rx="4" fill="#F9D3DD" stroke="${INK}" stroke-width="2.2"/><rect x="-11" y="-14" width="22" height="6" rx="2" fill="#fff" stroke="${INK}" stroke-width="1.5"/><text y="8" text-anchor="middle" font-size="9" fill="#72243E">泡打粉</text>`,
+ chips:`<path d="M-18 -20 L18 -20 L20 22 L-20 22 Z" fill="#E0607E" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><rect x="-9" y="-12" width="7" height="7" rx="1.5" fill="${INK}"/><rect x="3" y="-9" width="7" height="7" rx="1.5" fill="${INK}"/><text y="14" text-anchor="middle" font-size="9" fill="#fff">巧克力</text>`,
+ butter:`<rect x="-20" y="-12" width="40" height="26" rx="4" fill="#F7DE8C" stroke="${INK}" stroke-width="2.2"/><path d="M-20 -2 L20 -2 L20 14 L-20 14 Z" fill="#fff" stroke="${INK}" stroke-width="1.6"/><text y="10" text-anchor="middle" font-size="10" fill="${INK}">黄油</text>`,
+ bsugar:`<path d="M-16 -20 L16 -20 L18 22 L-18 22 Z" fill="#C98B55" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><path d="M-16 -13 L16 -13" stroke="${INK}" stroke-width="1.5"/><text y="8" text-anchor="middle" font-size="13" fill="#fff">红糖</text>`,
+ eggliq:`<path d="M-20 -8 Q-19 14 0 15 Q19 14 20 -8 Z" fill="#fff" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><ellipse cy="-8" rx="20" ry="5" fill="#F2C14E" stroke="${INK}" stroke-width="2"/><text y="9" text-anchor="middle" font-size="9" fill="${INK}">蛋液</text>`,
+ vanilla:`<rect x="-9" y="-6" width="18" height="26" rx="4" fill="#5A3322" stroke="${INK}" stroke-width="2.2"/><rect x="-4" y="-16" width="8" height="10" rx="2" fill="#2A170E" stroke="${INK}" stroke-width="1.6"/><rect x="-9" y="2" width="18" height="10" fill="#FAEEDA"/><text y="10" text-anchor="middle" font-size="7" fill="${INK}">香草</text>`,
+ soda:`<rect x="-11" y="-14" width="22" height="30" rx="3" fill="#fff" stroke="${INK}" stroke-width="2.2"/><rect x="-11" y="-6" width="22" height="10" fill="#378ADD"/><text y="2" text-anchor="middle" font-size="7" fill="#fff">小苏打</text>`,
+ salt:`<path d="M-10 -8 Q-10 -18 0 -18 Q10 -18 10 -8 Z" fill="#D3D1C7" stroke="${INK}" stroke-width="2"/><rect x="-10" y="-8" width="20" height="24" rx="3" fill="#fff" stroke="${INK}" stroke-width="2.2"/><circle cx="-3" cy="-13" r="1.2" fill="${INK}"/><circle cx="3" cy="-13" r="1.2" fill="${INK}"/><text y="9" text-anchor="middle" font-size="11" fill="${INK}">盐</text>`
+};
+/* ---------- recipes ---------- */
+const FR={0.125:'⅛',0.25:'¼',0.375:'⅜',0.5:'½',0.75:'¾',1:'1'};
+const num=v=>+v.toFixed(2);
+const RECIPES={
+ cake:{
+  title:'巧克力杯子蛋糕',unit:'杯',opts:[1,2,3,4,5,6,7,8],def:1,key:'mugN',ckKey:'mugCk',vessel:'cup',streamEnd:140,
+  tagline:n=>`${n} 杯 · 微波炉`,
+  srvL:'做几杯？',srvH:'在杯子上点一下或左右滑动选杯数。一杯是一份，用量会自动换算。',
+  base:{egg:[1],sugar:[20,25],milk:[20,30],flour:[24],starch:[6],cocoa:[5,6],bp:[1],chips:[10,15]},
+  unitOf:{egg:' 个',sugar:' g',milk:' mL',flour:' g',starch:' g',cocoa:' g',bp:' g',chips:' g'},
+  amt(k,n){return this.base[k].map(v=>num(v*n)).join('–')+this.unitOf[k]},
+  tag(k,n){return this.amt(k,n).replace(/ (g|mL)$/,'$1')},
+  shelf:{0:[['egg','egg',72,206],['sugar','sugar',301,197],['milk','milk',375,194]],
+   1:[['flour','flour',40,197],['starch','starch',108,200],['cocoa','cocoa',310,200],['bp','bp',376,206]],
+   2:[['chips','chips',340,197]]},
+  ing:[['普通面粉','flour'],['玉米淀粉','starch'],['无糖可可粉','cocoa'],['白糖','sugar'],['鸡蛋','egg'],['泡打粉','bp'],['牛奶','milk'],['巧克力碎块','chips']],
+  tools:n=>[['微波炉安全杯',`${n} 个`],['微波炉','700–800 W'],['搅拌勺',''],['空气炸锅','可选']],
+  notes:n=>['<b>份数加倍不等于加热时间加倍。</b>做多份要分装成多个杯子，每杯单独加热。全部装进一个大容器的话，中心需要更长时间才能熟，容易外面过熟、里面没熟。',
+   '每杯面糊不超过一半，加热时会膨胀，装太满会溢出来。','微波炉 700–800 W，每杯单独加热 60–90 秒；中心没凝固，每次再加 10–15 秒。',
+   '想要表面有烘烤感，可以放进空气炸锅，160 °C 再加热 2–4 分钟，注意观察，避免变干。','鸡蛋、糖、牛奶搅匀即可，不需要打发；加干粉后拌到没有干粉就停，别过度搅拌。']
+ },
+ cookie:{
+  title:'巧克力 Cookie',unit:'块',opts:[2,4,6,8],def:4,key:'ckN',ckKey:'ckCk',vessel:'bowl',streamEnd:178,
+  tagline:n=>`${n} 块 · 空气炸锅`,
+  srvL:'做几块？',srvH:'在饼干上点一下或左右滑动选块数。原配方是 4 块，用量会自动换算。',
+  base:{flour:100,starch:5,butter:55,bsugar:35,sugar:20,egg:25,soda:1,salt:.5,chips:50,vanilla:.25},
+  amt(k,n){const s=n/4,v=num(this.base[k]*s);
+    if(k==='egg')return `约 ${v} g 蛋液`;if(k==='vanilla')return `${FR[v]||v} 茶匙`;return `${v} g`},
+  tag(k,n){const s=n/4,v=num(this.base[k]*s);if(k==='vanilla')return `${FR[v]||v}茶匙`;return `${v}g`},
+  shelf:{0:[['butter','butter',62,206],['bsugar','bsugar',304,197],['sugar','sugar',372,197]],
+   1:[['egg','eggliq',62,210],['vanilla','vanilla',330,200]],
+   2:[['flour','flour',36,197],['starch','starch',100,200],['soda','soda',290,206],['salt','salt',328,204],['chips','chips',386,197]]},
+  ing:[['普通面粉','flour'],['玉米淀粉','starch'],['无盐黄油','butter'],['红糖','bsugar'],['白糖','sugar'],['鸡蛋','egg'],['小苏打','soda'],['盐','salt'],['巧克力碎块','chips'],['香草精（可选）','vanilla']],
+  tools:n=>[['大碗',''],['打蛋器或刮刀',''],['电子秤',''],['烘焙纸',''],['空气炸锅','320°F']],
+  notes:n=>['黄油要软化到能用手指轻轻按出凹痕，但不要融化。',`鸡蛋先打散，再称出需要的量（${n} 块用${RECIPES.cookie.amt('egg',n).replace('约 ','约')}）。`,
+   '如果用有盐黄油，可以不另外加盐。','这里不需要可可粉、泡打粉、牛奶。','拌粉时拌到没有干粉就停，加巧克力后不要过度搅拌。',
+   `面团冷藏 30–60 分钟后分成 ${n} 份，每份约 72 g，揉成较高的圆团，稍微压扁成厚饼，不要压得很薄。`,
+   '<b>烘焙纸要用面团压住，不能空锅铺纸预热。</b>','空气炸锅预热到 320°F（约 160 °C），烤 9–12 分钟，边缘定型、中心略软时取出，静置 10 分钟再吃。','空气炸锅容量小的话，每次烤 2 块即可。']
+ }
+};
+let RID='cake',R=RECIPES.cake,N=1;
+const loadN=()=>{let v=R.def;try{const x=+localStorage.getItem(R.key);if(R.opts.includes(x))v=x}catch(e){}return v};
+const amt=k=>R.amt(k,N);
+let SHELF={},STEPS=[],B=[];
+const B1C={1:'#F6DFA8',2:'#7A4A32',egg:'#F8E2A0',milk:'#FBF4E4'};
+const CK={butter:'#F7DE8C',cream:'#F3DFA8',egg:'#F0D08A',dough:'#E0B577'};
+function build(){
+  SHELF=R.shelf;
+  const P=(v,i,k,o)=>({v,i,a:amt(k),act:'pour',it:k,bub:`${i.replace(/^(普通|玉米|无糖|软化)/,'').replace('（可选）','')} ${amt(k)}`,...o});
+  if(RID==='cookie'){
+    STEPS=['黄油糖','鸡蛋','粉类','冷藏整形','烘烤'];
+    B=[
+     P('加入','软化黄油','butter',{s:0,fx:'chunks',col:'#F7DE8C',lv:.3,t:'黄油软化到能按出凹痕，但不要融化。',mx:{liq:CK.butter,deps:['butter']}}),
+     P('加入','红糖','bsugar',{s:0,fx:'powder',col:'#B57A45',lv:.4,mx:{liq:CK.butter,deps:['butter','bsugar']}}),
+     P('加入','白糖','sugar',{s:0,fx:'powder',col:'#FFFFFF',lv:.45,mx:{liq:CK.butter,deps:['butter','bsugar','sugar']}}),
+     {s:0,v:'搅拌',i:'1–2 分钟',d:'黄油和糖拌到蓬松',lv:.45,sp:1,mx:{liq:CK.cream,deps:[]}},
+     P('加入','鸡蛋','egg',{s:1,fx:'liquid',col:'#F2C14E',lv:.55,t:'鸡蛋先打散，再称出需要的量。',mx:{liq:CK.cream,deps:['eggpool']}}),
+     P('加入','香草精（可选）','vanilla',{s:1,fx:'liquid',col:'#5A3322',lv:.56,mx:{liq:CK.cream,deps:['eggpool','vanilla']}}),
+     {s:1,v:'搅拌',i:'搅匀',d:'蛋液完全融进黄油里',lv:.56,sp:1,mx:{liq:CK.egg,deps:[]}},
+     P('加入','普通面粉','flour',{s:2,fx:'powder',col:'#FFFDF5',lv:.74,mx:{liq:CK.egg,deps:['flour']}}),
+     P('加入','玉米淀粉','starch',{s:2,fx:'powder',col:'#FAEEDA',lv:.76,mx:{liq:CK.egg,deps:['flour','starch']}}),
+     P('加入','小苏打','soda',{s:2,fx:'powder',col:'#FFFFFF',lv:.77,mx:{liq:CK.egg,deps:['flour','starch','soda']}}),
+     P('加入','盐','salt',{s:2,fx:'powder',col:'#FFFFFF',lv:.78,mx:{liq:CK.egg,deps:['flour','starch','soda','salt']}}),
+     {s:2,v:'搅拌',i:'拌到没有干粉',d:'别过度搅拌',lv:.78,sp:1,mx:{liq:CK.dough,deps:[]}},
+     P('加入','巧克力碎块','chips',{s:2,fx:'chunks',col:'#2A170E',lv:.84,mx:{liq:CK.dough,deps:['chips']}}),
+     {s:2,v:'轻拌',i:'稍微拌几下',d:'不要过度搅拌',lv:.84,sp:1,mx:{liq:CK.dough,deps:['chips']}},
+     {s:3,v:'冷藏',i:'盖好放冰箱',d:'30–60 分钟',bub:'冷藏 30–60 分钟',lv:.84,wrap:1,mx:{liq:CK.dough,deps:['chips']}},
+     {s:3,v:'分份',i:`分成 ${N} 份`,d:'每份约 72 g',bub:'每份约 72 g',balls:'ball'},
+     {s:3,v:'整形',i:'搓圆再压成厚饼',d:'不要压得很薄',balls:'disc'},
+     {s:4,v:'预热',i:'空气炸锅 320°F',d:'约 160 °C',t:'烘焙纸要用面团压住，不能空锅铺纸预热。',fry:'pre'},
+     {s:4,v:'烘烤',i:'间隔摆放',d:'320°F · 9–12 分钟',t:N>2?'空气炸锅容量小的话，每次烤 2 块即可。':'',fry:'bake',balls:'disc'},
+     {s:4,v:'出炉',i:'边缘定型、中心略软',d:'静置 10 分钟再吃',balls:'baked',steam:1}
+    ];
+    return;
+  }
+  STEPS=['湿料','干粉','巧克力',N>1?'分杯':'装杯','微波','烘烤'];
+  B=[
+   {s:0,v:'打入',i:'鸡蛋',a:amt('egg'),act:'crack',its:['egg'],bub:`鸡蛋 ${amt('egg')}`,lv:.16,c:1},
+   P('倒入','白糖','sugar',{s:0,fx:'powder',col:'#FFFFFF',lv:.24,c:1}),
+   P('倒入','牛奶','milk',{s:0,fx:'liquid',col:'#FFFFFF',lv:.34,c:1}),
+   {s:0,v:'搅拌',i:'搅匀',d:'鸡蛋、糖、牛奶',t:'搅均匀就行，不需要打发。',lv:.34,c:1,sp:1},
+   P('倒入','普通面粉','flour',{s:1,fx:'powder',col:'#FFFDF5',lv:.42,c:1}),
+   P('倒入','玉米淀粉','starch',{s:1,fx:'powder',col:'#FAEEDA',lv:.46,c:1}),
+   P('倒入','无糖可可粉','cocoa',{s:1,fx:'powder',col:'#7A4A32',lv:.5,c:1}),
+   P('倒入','泡打粉','bp',{s:1,fx:'powder',col:'#F9D3DD',lv:.52,c:1}),
+   {s:1,v:'搅拌',i:'拌到没有干粉',d:'别过度搅拌',lv:.53,c:2,sp:1},
+   P('倒入','巧克力碎块','chips',{s:2,fx:'chunks',col:INK,lv:.57,c:2,ch:1}),
+   {s:2,v:'轻拌',i:'稍微拌几下',d:'留几块在表面更好看',lv:.57,c:2,ch:1,sp:1}
+  ];
+  if(N>1)B.push({s:3,v:'分装',i:`${N} 个杯子`,d:'微波炉安全杯，平均分',lv:.48,c:2,ch:1,row:1});
+  B.push({s:3,v:'检查',i:N>1?'每杯不超过一半':'不超过半杯',d:'看粉色虚线',bub:'≤ 1/2 杯',t:'加热会膨胀，装太满会溢出来。',lv:.48,c:2,ch:1,row:1,half:1});
+  B.push({s:4,v:'加热',i:N>1?'每杯单独':'这一杯',d:'700–800 W · 60–90 秒',t:N>1?`共 ${N} 杯，一杯一杯轮流加热，不要一起放。`:'',ch:1,mw:1,tm:'90'});
+  B.push({s:4,v:'补时',i:'中心没凝固？',d:'每次加 10–15 秒',t:'一次别加太多，蛋糕会变硬。',ch:1,mw:1,tm:'+15'});
+  B.push({s:5,v:'烘烤',i:'空气炸锅（可选）',d:'160 °C · 2–4 分钟',t:'想要表面有烘烤感再做，注意观察，避免变干。',row:1,all:1,cr:1,heat:1});
+  B.push({s:5,v:'完成',i:'开吃！',d:`${N} 杯巧克力杯子蛋糕`,row:1,all:1,cr:1,steam:1});
+  /* what the cup surface looks like after each beat */
+  let liq=null,deps=[];
+  B.forEach(b=>{
+    if(b.s>2){b.mx={liq:B1C[2],deps:[]};return}
+    if(b.it==='milk'||b.its)liq=b.its?'egg':'milk';
+    if(b.its)deps.push('yolk');else if(b.it)deps.push(b.it);
+    if(b.sp){liq=b.s===0?1:2;deps=b.s===2?['chips']:[]}
+    if(b.it==='chips')liq=2;
+    b.mx={liq:typeof liq==='string'?B1C[liq]:B1C[liq],deps:[...deps]};
+  });
+}
+const $=id=>document.getElementById(id);
+const st=(id,css)=>Object.assign($(id).style,css);
+const op=(id,v)=>$(id).setAttribute('opacity',v);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let cur=0,auto=false,tick=null,sx=null,gen=0,anims=[],nextT=null;
+let POS={};
+function buildShelf(){
+  POS={};
+  $('shelf').innerHTML=Object.entries(SHELF).map(([sx,arr])=>arr.map(([id,k,x,y])=>{POS[id]={x,y,s:+sx,amt:amt(id)};
+    return `<g class="item ${k==='egg'?'egg':''}" id="it_${id}" style="transform:translate(${x}px,${y}px) rotate(0deg) scale(1.6)"><g class="art">${ART[k]}</g><g class="chk" transform="translate(${k==='egg'?16:15} ${k==='egg'?-14:-20})"><circle r="9" fill="#639922" stroke="#3B2418" stroke-width="1.8"/><path d="M-4.5 0.5 L-1.2 3.8 L4.8 -3.2" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></g>`}).join('')).join('');
+  $('tags').innerHTML=Object.keys(POS).map(id=>`<text class="tag" id="tg_${id}" x="${POS[id].x}" y="258" text-anchor="middle">${R.tag(id,N)}</text>`).join('');
+  requestAnimationFrame(fitTags);
+  $('steps').innerHTML=STEPS.map((n,k)=>`<li><button data-s="${k}" aria-label="第 ${k+1} 步 ${n}"><b>${k+1}</b><span>${n}</span></button></li>`).join('');
+}
+function fitTags(){for(const id in POS){const t=$('tg_'+id);t.style.fontSize='';const w=t.getComputedTextLength(),max=id==='egg'?90:68;if(w>max)t.style.fontSize=(17*max/w).toFixed(1)+'px'}}
+const home=id=>`translate(${POS[id].x}px,${POS[id].y}px) rotate(0deg) scale(1.6)`;
+const A=(el,kf,ms,o={})=>{const a=el.animate(kf,{duration:reduce?1:ms,fill:'forwards',easing:'cubic-bezier(.5,0,.25,1)',...o});anims.push(a);return a.finished.catch(()=>{})};
+
+const CUPTPL=`<g class="cupg" id="cup__K__" style="transform:translate(170px,172px) scale(.8);opacity:0">
+          <use href="#cupBody"/>
+          <g clip-path="url(#cupClip)"><rect class="bat" id="bat__K__" x="-55" y="-62" width="110" height="126" fill="var(--b2)" style="transform:scaleY(0)"/></g>
+          <path class="dome" id="dome__K__" d="M-48 -62 Q-46 -96 0 -98 Q46 -96 48 -62 Z" fill="var(--b2)" stroke="var(--choc)" stroke-width="2.2" style="transform:scaleY(0)"/>
+          <g class="fade" id="chips__K__" opacity="0"><rect x="-20" y="10" width="9" height="9" rx="2" fill="var(--choc)"/><rect x="12" y="16" width="8" height="8" rx="2" fill="var(--choc)" transform="rotate(20 16 20)"/></g>
+          <line class="fade" id="half__K__" x1="-44" y1="-2" x2="44" y2="-2" stroke="var(--pink)" stroke-width="2.4" stroke-dasharray="6 4" opacity="0"/>
+          <path class="fade" id="crust__K__" d="M-40 -74 Q0 -92 40 -74" fill="none" stroke="#2A170E" stroke-width="5" stroke-linecap="round" opacity="0"/>
+          <rect x="-49" y="-66" width="98" height="7" rx="3.5" fill="var(--cupL)" stroke="var(--choc)" stroke-width="2.2"/>
+        <g class="fade" id="ht__K__" opacity="0" fill="none" stroke="#EF9F27" stroke-width="3" stroke-linecap="round"><path class="wave" d="M-22 -104 q6 -8 0 -16 q-6 -8 0 -16"/><path class="wave" style="animation-delay:.4s" d="M18 -100 q6 -8 0 -16 q-6 -8 0 -16"/></g><g class="fade" id="sm__K__" opacity="0" fill="none" stroke="var(--soft)" stroke-width="2.6" stroke-linecap="round"><path class="wave" d="M-10 -104 q5 -7 0 -14 q-5 -7 0 -14"/><path class="wave" style="animation-delay:.5s" d="M14 -108 q5 -7 0 -14 q-5 -7 0 -14"/></g></g>`;
+const cupIds=()=>['A',...Array.from({length:N-1},(_,k)=>'X'+(k+1))];
+function buildCups(){if(RID!=='cake'){$('extraCups').innerHTML='';return}$('extraCups').innerHTML=cupIds().slice(1).map(k=>CUPTPL.replaceAll('__K__',k)).join('')}
+const VS=()=>R.vessel==='bowl'?{surf:'bSurf',surfE:'bSurfE',deps:'bDeps'}:{surf:'surf',surfE:'surfE',deps:'deps'};
+function setBatter(lv,c){
+  if(R.vessel==='bowl'){const d=14-12*lv,sc=(72-d*1.6)/72;$('bSurf').style.transform=`translate(0px,${-40+d}px) scale(${sc})`;if(typeof c==='string')$('bSurfE').setAttribute('fill',c);return}
+  st('batA',{transform:`scaleY(${lv})`,fill:typeof c==='string'?c:(c===1?'var(--b1)':'var(--b2)')});
+  const top=64-126*lv;$('surf').style.transform=`translate(0px,${top}px)`;$('surfE').setAttribute('rx',Math.max(30,40+8*(58-top)/120-1));}
+const DEP={
+  yolk:()=>{const n=Math.min(N,3),xs=[[-6],[-16,10],[-20,0,20]][n-1];return xs.map((x,k)=>`<g><ellipse cx="${x}" cy="${k%2?1:-1}" rx="14" ry="5" fill="#FFFDF3" stroke="#E9DCC0" stroke-width="1"/><ellipse cx="${x}" cy="${(k%2?1:-1)-1}" rx="8" ry="4.4" fill="#F2A93B" stroke="#C9781A" stroke-width="1"/><ellipse cx="${x-2}" cy="${(k%2?1:-1)-2.2}" rx="2" ry="1" fill="#fff" opacity=".8"/></g>`).join('')},
+  sugar:()=>`<path d="M16 3 Q26 -8 36 3 Z" fill="#fff" stroke="#D8CBB2" stroke-width="1"/><circle cx="23" cy="-1" r="1" fill="#D8CBB2"/><circle cx="29" cy="0" r="1" fill="#D8CBB2"/>`,
+  milk:()=>'',
+  flour:()=>`<path d="M-36 3 Q-22 -14 -6 3 Z" fill="#FFFDF5" stroke="#D9CDB6" stroke-width="1.2"/>`,
+  starch:()=>`<path d="M-4 3 Q5 -8 14 3 Z" fill="#FFF6E2" stroke="#D9CDB6" stroke-width="1.2"/>`,
+  cocoa:()=>`<path d="M12 3 Q23 -12 34 3 Z" fill="#6B3E2A" stroke="#3B2418" stroke-width="1.2"/>`,
+  bp:()=>`<path d="M-14 4 Q-9 -2 -4 4 Z" fill="#fff" stroke="#E2B6C4" stroke-width="1"/>`,
+  butter:()=>[[-32,-1],[-20,2],[-10,-2]].map(([x,y],k)=>`<rect x="${x-6}" y="${y-5}" width="12" height="9" rx="2" fill="#F7DE8C" stroke="#C9A54A" stroke-width="1.2" transform="rotate(${k*15-10} ${x} ${y})"/>`).join(''),
+  bsugar:()=>`<path d="M-6 3 Q4 -10 14 3 Z" fill="#B57A45" stroke="#7A4A32" stroke-width="1.2"/>`,
+  eggpool:()=>`<ellipse cx="-6" cy="0" rx="22" ry="5.5" fill="#F2C14E" stroke="#D9A230" stroke-width="1.2"/><ellipse cx="-12" cy="-1.5" rx="5" ry="1.4" fill="#fff" opacity=".7"/>`,
+  vanilla:()=>`<ellipse cx="20" cy="0" rx="5" ry="2.4" fill="#5A3322"/>`,
+  soda:()=>`<path d="M16 3 Q21 -5 26 3 Z" fill="#fff" stroke="#B5D4F4" stroke-width="1.2"/>`,
+  salt:()=>`<path d="M29 3 Q33 -3 37 3 Z" fill="#fff" stroke="#B4B2A9" stroke-width="1"/>`,
+  chips:()=>[[-24,0],[-8,-2],[8,1],[22,-1],[0,3],[-16,3]].map(([x,y],k)=>`<rect x="${x-3.5}" y="${y-3.5}" width="7" height="7" rx="1.5" fill="#2A170E" transform="rotate(${k*27} ${x} ${y})"/>`).join('')
+};
+/* draw the surface: liq colour + visible deposits; fresh = key that just landed */
+function mix(m,fresh){
+  if(!m)return;const V=VS();$(V.surfE).setAttribute('fill',m.liq);$(V.surfE).setAttribute('stroke',m.liq==='#7A4A32'?'#5A3322':m.liq==='#E0B577'?'#B98A4C':'#D9BE86');
+  const g=$(V.deps);const keep=new Set(m.deps);
+  [...g.children].forEach(c=>{if(!keep.has(c.dataset.k)){c.classList.add('gone');setTimeout(()=>c.remove(),700)}});
+  m.deps.forEach(k=>{if(g.querySelector(`[data-k="${k}"]:not(.gone)`))return;
+    const e=document.createElementNS('http://www.w3.org/2000/svg','g');e.setAttribute('class','dep'+(k===fresh?' new':''));e.dataset.k=k;e.innerHTML=DEP[k]();g.appendChild(e)});
+}
+function rowPos(k,n){const sp=Math.min(130,330/n),sc=Math.min(n===1?1:.8,sp/125);return {x:170+(k-(n-1)/2)*sp,sc}}
+function scene(b,lv,c){
+  ['bowlG','fryG','parch','snow'].forEach(i=>op(i,0));$('balls').innerHTML='';
+  $('spoon').removeAttribute('transform');const re=document.querySelector('.ringE');re.setAttribute('cy',100);re.setAttribute('rx',66);
+  const ids=cupIds();
+  ids.forEach((k,j)=>{
+    let t,o=1,dome=0,bl=b.lv,crust=0;
+    if(b.mw){ if(j===0){t='translate(112px,188px) scale(.62)';dome=1}
+      else{const n=ids.length-1,sp=Math.min(34,110/n),sc=.42;t=`translate(${262+(j-1)*sp}px,${234-62*sc}px) scale(${sc})`;bl=.48}}
+    else if(b.row){const p=rowPos(j,ids.length);t=`translate(${p.x}px,${234-62*p.sc}px) scale(${p.sc})`}
+    else{t='translate(170px,172px)';if(j>0){o=0;bl=0}}
+    if(b.all){dome=1;crust=b.cr?1:0}
+    st('cup'+k,{transform:t,opacity:o});
+    if(j>0)st('bat'+k,{transform:`scaleY(${dome?1:bl})`});
+    st('dome'+k,{transform:`scaleY(${dome})`});
+    op('chips'+k,b.ch&&!dome&&!(j===0&&b.act&&b.fx==='chunks')&&(j===0||b.row||b.mw)?1:0);
+    op('half'+k,b.half?1:0);op('crust'+k,crust);
+    op('ht'+k,b.heat?1:0);op('sm'+k,b.steam?1:0);
+  });
+  const pv=B[B.indexOf(b)-1],liq0=b.act||b.sp?(pv&&pv.mx?pv.mx:{liq:B1C[1],deps:[]}):b.mx;
+  $('deps').innerHTML='';
+  setBatter((b.mw||b.all)?1:lv,(b.mw||b.all)?2:(b.s<=2?liq0.liq:2));
+  op('surf',(b.mw||b.all||b.s>2)?0:(lv>0?1:0));
+  if(b.s<=2)mix(liq0);
+  if(b.sp&&b.s<=2){const g0=gen;setTimeout(()=>{if(g0!==gen)return;mix(b.mx);st('batA',{fill:b.mx.liq})},900)}
+  op('mw',b.mw?1:0);op('spoon',b.sp?1:0);op('ring',b.sp?1:0);op('swirl',b.sp?1:0);
+  $('swirlY').setAttribute('transform',`translate(0 ${64-126*(lv||0)+4})`);$('swirlP').setAttribute('stroke',c===1?'#E2B864':'#A9714F');
+  bubble(b);op('steam',0);
+  clearInterval(tick);
+  if(b.tm){$('timer').textContent=b.tm;if(b.tm==='90'){let t=90;tick=setInterval(()=>{t=t>60?t-1:90;$('timer').textContent=t},60)}}
+}
+function renderBalls(b){
+  const g=$('balls');if(!b.balls){g.innerHTML='';return}
+  const n=N,sp=Math.min(80,320/n),r=Math.min(24,sp*.36),base=b.fry?222:226;
+  g.innerHTML=Array.from({length:n},(_,k)=>{const x=210+(k-(n-1)/2)*sp;let body,cy;
+    if(b.balls==='ball'){cy=base-r;body=`<circle cx="${x}" cy="${cy}" r="${r}" fill="${CK.dough}" stroke="${INK}" stroke-width="2.2"/>`}
+    else if(b.balls==='disc'){cy=base-r*.62;body=`<ellipse cx="${x}" cy="${cy}" rx="${r*1.22}" ry="${r*.62}" fill="${CK.dough}" stroke="${INK}" stroke-width="2.2"/>`}
+    else{cy=base-r*.55;body=`<ellipse cx="${x}" cy="${cy}" rx="${r*1.45}" ry="${r*.55}" fill="#D79A52" stroke="${INK}" stroke-width="2.2"/><ellipse cx="${x-r*.15}" cy="${cy-r*.12}" rx="${r*.95}" ry="${r*.3}" fill="#E8BB78"/><path d="M${x-r*.8} ${cy} q${r*.3} ${-r*.15} ${r*.6} 0" stroke="#B57A3E" stroke-width="1.6" fill="none"/>`}
+    const q=r*.32,chip=(dx,dy,a)=>`<rect x="${x+dx*r-q/2}" y="${cy+dy*r-q/2}" width="${q}" height="${q}" rx="1.5" fill="#2A170E" transform="rotate(${a} ${x+dx*r} ${cy+dy*r})"/>`;
+    const st=b.steam?`<g fill="none" stroke="var(--soft)" stroke-width="2.2" stroke-linecap="round"><path class="wave" style="animation-delay:${k*.2}s" d="M${x} ${cy-r*.7} q4 -6 0 -12 q-4 -6 0 -12"/></g>`:'';
+    return `<g class="pop">${body}${chip(-.45,-.15,12)}${chip(.25,-.25,-14)}${chip(.05,.12,28)}${st}</g>`}).join('');
+}
+function cookieScene(b,lv){
+  st('cupA',{opacity:0});op('mw',0);op('swirl',0);op('steam',0);
+  const bowl=!b.balls&&!b.fry;
+  op('bowlG',bowl?1:0);op('wrapF',b.wrap?1:0);op('snow',b.wrap?1:0);
+  op('fryG',b.fry?1:0);op('parch',b.balls&&!b.fry?1:0);
+  const pv=B[B.indexOf(b)-1],m0=(b.act||b.sp)?(pv&&pv.mx?pv.mx:null):b.mx;
+  $('bDeps').innerHTML='';
+  if(bowl){setBatter(lv||0,m0?m0.liq:CK.butter);op('bSurf',lv>0&&m0?1:0);if(m0)mix(m0)}
+  if(b.sp){const g0=gen;setTimeout(()=>{if(g0!==gen)return;mix(b.mx)},900)}
+  op('bSwirl',b.sp?1:0);$('bSwirlP').setAttribute('stroke',(b.mx&&b.mx.liq===CK.dough)?'#B98A4C':'#D9B46A');
+  op('spoon',b.sp?1:0);op('ring',b.sp?1:0);
+  $('spoon').setAttribute('transform','translate(0 46)');const re=document.querySelector('.ringE');re.setAttribute('cy',158);re.setAttribute('rx',80);
+  renderBalls(b);bubble(b);
+  clearInterval(tick);
+  if(b.fry==='pre')$('fryT').textContent='预热 320°F';
+  if(b.fry==='bake'){let t=720;tick=setInterval(()=>{t=t>540?t-5:720;$('fryT').textContent=`320°F · ${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`},60)}
+}
+function bubble(b){
+  const g=$('bubble');if(!b.bub){g.setAttribute('opacity',0);return}
+  const sd=b.it?(POS[b.it].x<200?-1:1):b.its?-1:0;
+  const x=sd===0?200:200-sd*104,y=sd===0?40:30;
+  g.innerHTML=`<g class="bub" style="transform-box:fill-box;transform-origin:center"><rect rx="19" height="38" fill="var(--pink)" stroke="#3B2418" stroke-width="2.2"/><text y="22" text-anchor="middle" font-size="21" fill="#fff" font-family="ZCOOL KuaiLe,PingFang SC,sans-serif">${b.bub}</text></g>`;
+  g.setAttribute('opacity',1);
+  const t=g.querySelector('text'),r=g.querySelector('rect'),w=Math.ceil(t.getComputedTextLength()||[...b.bub].reduce((a,ch)=>a+(/[\x00-\xff]/.test(ch)?11:21),0))+26;
+  const cx=Math.min(420-w/2-4,Math.max(w/2+4,x));
+  r.setAttribute('x',cx-w/2);r.setAttribute('y',y-19);r.setAttribute('width',w);t.setAttribute('x',cx);t.setAttribute('y',y+7);
+}
+const tagTxt=id=>R.tag(id,N);
+function tagState(id,used){const t=$('tg_'+id);t.textContent=tagTxt(id);t.classList.toggle('done',used);if(used)t.classList.remove('on')}
+function shelf(i){
+  const b=B[i];
+  const usedBefore=new Set();B.slice(0,i).forEach(x=>{(x.its||[]).forEach(e=>usedBefore.add(e));if(x.it)usedBefore.add(x.it)});
+  for(const id in POS){const el=$('it_'+id);el.style.transform=home(id);
+    el.style.opacity=POS[id].s===b.s?1:0;
+    el.classList.remove('open');el.classList.toggle('used',usedBefore.has(id));tagState(id,usedBefore.has(id));
+    const tg=$('tg_'+id);tg.style.opacity=POS[id].s===b.s?1:0;tg.classList.toggle('on',b.it===id||(b.its||[]).includes(id))}
+}
+async function crack(b,g,lv0){
+  const n=b.its.length;
+  for(let k=0;k<n;k++){
+    const id=b.its[k],el=$('it_'+id),P='translate(200px,50px) rotate(0deg) scale(1.6)';
+    await A(el,[{transform:home(id)},{transform:'translate(200px,30px) rotate(-8deg) scale(1.6)',offset:.7},{transform:P}],750);if(g!==gen)return;
+    el.classList.add('open');
+    const y=document.createElementNS('http://www.w3.org/2000/svg','g');
+    y.innerHTML='<ellipse rx="9" ry="6" fill="#fff" stroke="#3B2418" stroke-width="1.5"/><circle r="4.5" fill="#EF9F27"/>';
+    $('streams').appendChild(y);
+    A(y,[{transform:'translate(200px,64px)'},{transform:'translate(200px,140px)'}],520,{easing:'cubic-bezier(.5,0,1,1)'});
+    await wait(380);setBatter(lv0+(b.lv-lv0)*(k+1)/n,b.mx.liq);op('surf',1);mix(b.mx,'yolk');
+    await wait(450);if(g!==gen)return;
+    y.remove();el.classList.remove('open');el.classList.add('used');tagState(id,true);
+    await A(el,[{transform:P},{transform:home(id)}],700);if(g!==gen)return;
+  }
+}
+async function pour(b,g){
+  const id=b.it,el=$('it_'+id),sd=POS[id].x<200?-1:1;
+  const at=`translate(${200+sd*32}px,44px)`,rot=sd<0?110:-110;
+  await A(el,[{transform:home(id)},{transform:at+' rotate(0deg) scale(1.6)'}],700);if(g!==gen)return;
+  await A(el,[{transform:at+' rotate(0deg) scale(1.6)'},{transform:`${at} rotate(${rot}deg) scale(1.6)`}],420);if(g!==gen)return;
+  const S=$('streams');
+  if(b.fx==='liquid'){
+    S.innerHTML=`<rect class="liq" x="197" y="58" width="7" height="${R.streamEnd-58}" rx="3.5" fill="${b.col}" stroke="${INK}" stroke-width="1.6"/>`;
+    A(S.firstChild,[{transform:'scaleY(0)'},{transform:'scaleY(1)'}],260);
+  }else if(b.fx==='powder'){
+    S.innerHTML=`<line x1="200" y1="62" x2="200" y2="${R.streamEnd}" stroke="${INK}" stroke-width="7.5" stroke-linecap="round" stroke-dasharray="0 9"/><line x1="200" y1="62" x2="200" y2="${R.streamEnd}" stroke="${b.col}" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="0 9"/>`;
+    S.querySelectorAll('line').forEach(l=>A(l,[{strokeDashoffset:0},{strokeDashoffset:-36}],380,{iterations:5,easing:'linear'}));
+  }else{
+    const cs=b.it==='butter'?14:10;S.innerHTML=[0,1,2,3,4,5].map(k=>`<rect x="${-cs/2}" y="${-cs/2}" width="${cs}" height="${cs}" rx="2" fill="${b.col}" stroke="${INK}" stroke-width="1.4"/>`).join('');
+    [...S.children].forEach((r,k)=>A(r,[{transform:`translate(${196+(k%3)*4}px,62px) rotate(0deg)`},{transform:`translate(${194+(k%3)*6}px,${R.streamEnd+5}px) rotate(${90+k*30}deg)`}],520,{delay:k*200,easing:'cubic-bezier(.5,0,1,1)'}));
+  }
+  await wait(250);setBatter(b.lv,b.mx.liq);op(VS().surf,1);mix(b.mx,b.it);
+  await wait(1250);if(g!==gen)return;
+  S.innerHTML='';
+  if(b.fx==='chunks'&&RID==='cake')op('chipsA',1);
+  el.classList.add('used');tagState(id,true);
+  await A(el,[{transform:`${at} rotate(${rot}deg) scale(1.6)`},{transform:at+' rotate(0deg) scale(1.6)'}],380);if(g!==gen)return;
+  await A(el,[{transform:at+' rotate(0deg) scale(1.6)'},{transform:home(id)}],700);
+}
+function show(i){
+  gen++;const g=gen;anims.forEach(a=>a.cancel());anims=[];clearTimeout(nextT);$('streams').innerHTML='';
+  cur=Math.max(0,Math.min(B.length-1,i));const b=B[cur],pv=B[cur-1];
+  const inStep=B.filter(x=>x.s===b.s),k=inStep.indexOf(b)+1;
+  $('verb').textContent=b.v;$('item').innerHTML=b.a?`${b.i}<span class="amt">${b.a}</span>`:b.i;$('detail').textContent=b.a?'':b.d;$('tip').textContent=b.t||'';
+  $('fill').style.width=(k/inStep.length*100)+'%';$('frac').textContent=`${k} / ${inStep.length}`;
+  const c=$('card');c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');
+  [...$('steps').children].forEach((li,j)=>{li.className=j===b.s?'on':j<b.s?'done':''});
+  shelf(cur);
+  const lv0=b.act?(pv?pv.lv:0):b.lv,c0=b.act?(pv?pv.c:1):b.c;
+  (RID==='cake'?scene:cookieScene)(b,lv0,c0);
+  if(cur===B.length-1)confetti();
+  const run=b.act==='crack'?crack(b,g,lv0):b.act==='pour'?pour(b,g):wait(0);
+  run.then(()=>{if(g!==gen||!auto)return;
+    nextT=setTimeout(()=>{if(g!==gen||!auto)return;cur<B.length-1?show(cur+1):play(false)},b.act?700:2400)});
+  ($('play')||{}).textContent=auto?'暂停':(cur===B.length-1?'重播':'播放');
+}
+function play(on){
+  auto=on;
+  if(on){show(cur===B.length-1?0:cur)}else{clearTimeout(nextT)}
+  ($('play')||{}).textContent=auto?'暂停':(cur===B.length-1?'重播':'播放');
+}
+const manual=d=>{auto=false;const n=Math.max(0,Math.min(B.length-1,cur+d));if(n!==cur){ac();sfx('click')}show(n)};
+$('steps').onclick=e=>{const t=e.target.closest('button');if(!t)return;auto=false;show(B.findIndex(x=>x.s===+t.dataset.s))};
+$('scene').onclick=()=>show(cur);
+$('card').onclick=e=>{const r=e.currentTarget.getBoundingClientRect(),left=e.clientX<r.left+r.width/2;
+  const n=e.currentTarget.querySelector(left?'.nl':'.nr');n.classList.add('hit');setTimeout(()=>n.classList.remove('hit'),220);manual(left?-1:1)};
+addEventListener('keydown',e=>{if(e.key==='ArrowRight')manual(1);if(e.key==='ArrowLeft')manual(-1);if(e.key===' '){e.preventDefault();play(!auto)}});
+const stg=document.querySelector('.stage');
+stg.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+stg.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)manual(dx<0?1:-1)});
+/* ---------- sound (Web Audio, synthesized) ---------- */
+let AC=null,sndOn=true,live=[];
+const ac=()=>{if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==='suspended')AC.resume();return AC};
+const noiseBuf=()=>{const a=AC,b=a.createBuffer(1,a.sampleRate*2,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b};
+let NB=null;
+function noise(t,dur,{type='bandpass',f=1000,q=1,vol=.3,att=.02,rel=.15,lfo=0,lfoDepth=0}={}){
+  const a=AC;NB=NB||noiseBuf();const s=a.createBufferSource();s.buffer=NB;s.loop=true;
+  const fl=a.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;
+  const g=a.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.setValueAtTime(vol,t+Math.max(att,dur-rel));g.gain.linearRampToValueAtTime(0,t+dur);
+  s.connect(fl).connect(g).connect(a.destination);
+  if(lfo){const o=a.createOscillator(),og=a.createGain();o.frequency.value=lfo;og.gain.value=lfoDepth;o.connect(og).connect(g.gain);o.start(t);o.stop(t+dur);live.push(o)}
+  s.start(t);s.stop(t+dur+.05);live.push(s);return fl;
+}
+function tone(t,f,dur,{type='sine',vol=.2,to=null,keep=false}={}){
+  const a=AC,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.02);if(!keep)live.push(o);
+}
+function stopSnd(){live.forEach(n=>{try{n.stop()}catch(e){}});live=[]}
+function sfx(k){
+  if(k!=='click')return;const a=AC;if(!a||a.state!=='running')return;const t=a.currentTime+.01;
+  if(k==='click'){tone(t,880,.06,{type:'triangle',vol:.12,keep:true});return}
+
+}
+addEventListener('pointerdown',()=>{ac()},{capture:true});
+addEventListener('click',e=>{if(e.target.closest('button,a,#cupBar')&&!e.target.closest('.card')){ac();sfx('click')}});
+
+/* ---------- confetti ---------- */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],raf=null;
+function confetti(){
+  if(reduce)return;const W=cv.width=innerWidth*devicePixelRatio,H=cv.height=innerHeight*devicePixelRatio,d=devicePixelRatio;
+  const cols=['#E0607E','#F0997B','#FAC775','#85B7EB','#97C459','#7A4A32','#F9D3DD'];
+  const burst=(x,y,ang,spread,n,sp)=>{for(let i=0;i<n;i++){const a=ang+(Math.random()-.5)*spread,v=(sp*.6+Math.random()*sp)*d;
+    parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,w:(6+Math.random()*6)*d,h:(9+Math.random()*8)*d,r:Math.random()*6,vr:(Math.random()-.5)*.35,c:cols[i%cols.length],round:Math.random()<.25,life:0})}};
+  burst(0,H,-Math.PI/3,.7,90,17);burst(W,H,-Math.PI*2/3,.7,90,17);
+  setTimeout(()=>burst(W/2,H*.35,-Math.PI/2,Math.PI*2,80,10),350);
+  cancelAnimationFrame(raf);
+  const step=()=>{cx.clearRect(0,0,W,H);parts=parts.filter(p=>p.y<H+40*d&&p.life<320);
+    for(const p of parts){p.life++;p.vy+=.32*d;p.vx*=.99;p.vy*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.scale(1,Math.cos(p.life*.18));cx.fillStyle=p.c;
+      if(p.round){cx.beginPath();cx.arc(0,0,p.w/2,0,7);cx.fill()}else cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()}
+    if(parts.length)raf=requestAnimationFrame(step);else cx.clearRect(0,0,W,H)};
+  raf=requestAnimationFrame(step);
+}
+
+/* ---------- checklist page ---------- */
+let ING=[],TOOL=[],ck={};
+const loadCk=()=>{ck={};try{ck=JSON.parse(localStorage.getItem(R.ckKey)||'{}')}catch(e){}};
+const row=(p,[n,a],k)=>{const id=p+k;return `<li class="${ck[id]?'ok':''}"><label><input type="checkbox" data-id="${id}" ${ck[id]?'checked':''}><span class="nm">${n}</span><span class="am">${a}</span></label></li>`};
+function renderCl(){ING=R.ing.map(([n,k])=>[n,amt(k)]);TOOL=R.tools(N);
+  $('clIng').innerHTML=ING.map((r,k)=>row('i',r,k)).join('');$('clTool').innerHTML=TOOL.map((r,k)=>row('t',r,k)).join('');
+  $('notes').innerHTML=R.notes(N).map(t=>`<li>${t}</li>`).join('');count()}
+function count(){const n=ING.filter((_,k)=>ck['i'+k]).length;$('cnt').textContent=`已备好 ${n} / ${ING.length}`}
+$('checklist').addEventListener('change',e=>{const c=e.target;if(!c.dataset.id)return;ck[c.dataset.id]=c.checked;c.closest('li').classList.toggle('ok',c.checked);
+  try{localStorage.setItem(R.ckKey,JSON.stringify(ck))}catch(err){}count()});
+$('clReset').onclick=()=>{ck={};try{localStorage.removeItem(R.ckKey)}catch(e){}renderCl()};
+/* ---------- servings bar ---------- */
+const bar=$('cupBar');
+const CUPI=k=>`<svg class="c" viewBox="0 0 44 60"><path d="M32 18 Q42 18 41 27 Q40 35 31 34" fill="none" stroke="#3B2418" stroke-width="2.4"/><path class="body" d="M5 10 L35 10 L32 44 Q20 47 8 44 Z" stroke="#3B2418" stroke-width="2.4" stroke-linejoin="round"/><text x="20" y="58" text-anchor="middle">${k}</text></svg>`;
+const COOKI=k=>`<svg class="c ck" viewBox="0 0 80 60">${[[24,24],[54,28]].map(([x,y])=>`<circle class="body" cx="${x}" cy="${y}" r="16" stroke="#3B2418" stroke-width="2.4"/><rect x="${x-8}" y="${y-7}" width="5" height="5" rx="1.2" fill="#3B2418" opacity=".55"/><rect x="${x+2}" y="${y}" width="5" height="5" rx="1.2" fill="#3B2418" opacity=".55"/>`).join('')}<text x="40" y="58" text-anchor="middle">${k}</text></svg>`;
+function buildBar(){bar.style.gridTemplateColumns=`repeat(${R.opts.length},minmax(0,1fr))`;bar.innerHTML=R.opts.map(v=>RID==='cookie'?COOKI(v):CUPI(v)).join('');
+  bar.setAttribute('aria-valuemin',R.opts[0]);bar.setAttribute('aria-valuemax',R.opts[R.opts.length-1])}
+const paintBar=()=>{[...bar.children].forEach((c,k)=>c.classList.toggle('on',R.opts[k]<=N));bar.setAttribute('aria-valuenow',N);bar.setAttribute('aria-valuetext',N+' '+R.unit)};
+function applyN(){build();buildShelf();buildCups();$('rTitle').textContent=R.title;document.title=R.title;
+  $('tagline').textContent=R.tagline(N);$('nOut').textContent=N;$('nOut').dataset.u=R.unit;$('srvL').textContent=R.srvL;$('srvH').textContent=R.srvH;
+  renderCl();paintBar()}
+const setN=v=>{if(!R.opts.includes(v)||v===N)return;N=v;try{localStorage.setItem(R.key,N)}catch(e){}applyN();auto=false;cur=0};
+const pick=e=>{const r=bar.getBoundingClientRect(),L=R.opts.length;const i=Math.min(L,Math.max(1,Math.ceil((e.clientX-r.left)/r.width*L)));setN(R.opts[i-1])};
+let drag=false;
+bar.addEventListener('pointerdown',e=>{drag=true;try{bar.setPointerCapture(e.pointerId)}catch(err){}pick(e)});
+bar.addEventListener('contextmenu',e=>e.preventDefault());bar.addEventListener('selectstart',e=>e.preventDefault());
+bar.addEventListener('pointermove',e=>{if(drag)pick(e)});
+['pointerup','pointercancel'].forEach(t=>bar.addEventListener(t,()=>drag=false));
+bar.addEventListener('keydown',e=>{const i=R.opts.indexOf(N);if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();e.stopPropagation();setN(R.opts[Math.min(R.opts.length-1,i+1)])}if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();e.stopPropagation();setN(R.opts[Math.max(0,i-1)])}});
+/* ---------- routing ---------- */
+function stopAnim(){auto=false;clearTimeout(nextT);gen++;anims.forEach(a=>a.cancel());anims=[];clearInterval(tick)}
+function switchRecipe(id){RID=id;R=RECIPES[id];N=loadN();loadCk();buildBar();applyN();cur=0;
+  $('clBtn').href=`#${id}-list`;document.querySelectorAll('.backAnim').forEach(a=>a.href=`#${id}`)}
+let firstView=true;
+function route(){
+  let h=location.hash.slice(1);if(h==='checklist')h='cake-list';
+  if(!h||h==='menu'){stopAnim();$('menu').hidden=false;$('recipe').hidden=true;document.title='甜点菜单';scrollTo(0,0);return}
+  const [rid,sub]=h.split('-');if(!RECIPES[rid]){location.hash='';return}
+  $('menu').hidden=true;$('recipe').hidden=false;
+  let fresh=false;if(rid!==RID||firstView){switchRecipe(rid);fresh=true}
+  const on=sub==='list';$('checklist').hidden=!on;$('anim').hidden=on;$('clBtn').hidden=on;$('homeBtn').hidden=on;
+  if(on){stopAnim();scrollTo(0,0)}else{if(fresh){auto=!reduce}fitTags();show(cur)}
+  firstView=false;
+}
+addEventListener('hashchange',route);
+switchRecipe('cake');route();
+}
+
+</script>
+</body>
+</html>
