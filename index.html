@@ -141,7 +141,7 @@ h1{margin:0;text-align:center;font-size:clamp(32px,7vw,50px);line-height:1.1}
       </a>
       <a class="mcard" href="#cookie">
         <svg viewBox="0 0 120 100" aria-hidden="true"><ellipse cx="60" cy="58" rx="46" ry="34" fill="#D9A15E" stroke="#3B2418" stroke-width="3"/><ellipse cx="56" cy="54" rx="30" ry="20" fill="#E8BB78"/><rect x="38" y="44" width="11" height="11" rx="2" fill="#2A170E" transform="rotate(14 43 49)"/><rect x="66" y="40" width="12" height="12" rx="2" fill="#2A170E" transform="rotate(-10 72 46)"/><rect x="56" y="66" width="10" height="10" rx="2" fill="#2A170E" transform="rotate(25 61 71)"/><rect x="80" y="62" width="8" height="8" rx="2" fill="#2A170E"/><path d="M30 70 q8 4 14 0M74 30 q6 4 12 2" stroke="#B57A3E" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
-        <div><div class="mt">巧克力 Cookie</div><div class="ms">空气炸锅 · 2–8 块</div></div><span class="ma">›</span>
+        <div><div class="mt">Costco口味巧克力Cookie</div><div class="ms">空气炸锅 · 2–8 块</div></div><span class="ma">›</span>
       </a>
     </div>
     <p class="more">更多甜点，敬请期待</p>
@@ -309,7 +309,7 @@ const RECIPES={
    '想要表面有烘烤感，可以放进空气炸锅，160 °C 再加热 2–4 分钟，注意观察，避免变干。','鸡蛋、糖、牛奶搅匀即可，不需要打发；加干粉后拌到没有干粉就停，别过度搅拌。']
  },
  cookie:{
-  title:'巧克力 Cookie',unit:'块',opts:[2,4,6,8],def:4,key:'ckN',ckKey:'ckCk',vessel:'bowl',streamEnd:178,
+  title:'Costco口味巧克力Cookie',unit:'块',opts:[2,4,6,8],def:4,key:'ckN',ckKey:'ckCk',vessel:'bowl',streamEnd:178,
   tagline:n=>`${n} 块 · 空气炸锅`,
   srvL:'做几块？',srvH:'在饼干上点一下或左右滑动选块数。原配方是 4 块，用量会自动换算。',
   base:{flour:100,starch:5,butter:55,bsugar:35,sugar:20,egg:25,soda:1,salt:.5,chips:50,vanilla:.25},
@@ -571,9 +571,20 @@ async function pour(b,g){
   await A(el,[{transform:`${at} rotate(${rot}deg) scale(1.6)`},{transform:at+' rotate(0deg) scale(1.6)'}],380);if(g!==gen)return;
   await A(el,[{transform:at+' rotate(0deg) scale(1.6)'},{transform:home(id)}],700);
 }
+/* ---------- voice (Breeze 女声，每步读「红字动作 + 黑字食材」，不读克数) ---------- */
+const VOICE={"打入|鸡蛋":"v01.mp3","倒入|白糖":"v02.mp3","倒入|牛奶":"v03.mp3","搅拌|搅匀":"v04.mp3","倒入|普通面粉":"v05.mp3","倒入|玉米淀粉":"v06.mp3","倒入|无糖可可粉":"v07.mp3","倒入|泡打粉":"v08.mp3","搅拌|拌到没有干粉":"v09.mp3","倒入|巧克力碎块":"v10.mp3","轻拌|稍微拌几下":"v11.mp3","检查|不超过半杯":"v12.mp3","加热|这一杯":"v13.mp3","补时|中心没凝固？":"v14.mp3","烘烤|空气炸锅（可选）":"v15.mp3","完成|开吃！":"v16.mp3","分装|2 个杯子":"v17.mp3","检查|每杯不超过一半":"v18.mp3","加热|每杯单独":"v19.mp3","分装|3 个杯子":"v20.mp3","分装|4 个杯子":"v21.mp3","分装|5 个杯子":"v22.mp3","分装|6 个杯子":"v23.mp3","分装|7 个杯子":"v24.mp3","分装|8 个杯子":"v25.mp3","加入|软化黄油":"v26.mp3","加入|红糖":"v27.mp3","加入|白糖":"v28.mp3","搅拌|1–2 分钟":"v29.mp3","加入|鸡蛋":"v30.mp3","加入|香草精（可选）":"v31.mp3","加入|普通面粉":"v32.mp3","加入|玉米淀粉":"v33.mp3","加入|小苏打":"v34.mp3","加入|盐":"v35.mp3","加入|巧克力碎块":"v36.mp3","冷藏|盖好放冰箱":"v37.mp3","分份|分成 2 份":"v38.mp3","整形|搓圆再压成厚饼":"v39.mp3","预热|空气炸锅 320°F":"v40.mp3","烘烤|间隔摆放":"v41.mp3","出炉|边缘定型、中心略软":"v42.mp3","分份|分成 4 份":"v43.mp3","分份|分成 6 份":"v44.mp3","分份|分成 8 份":"v45.mp3"};
+let vNow=null;const vCache={};
+function speak(b){
+  try{if(vNow){vNow.pause();vNow.currentTime=0}}catch(e){}
+  vNow=null;if(!sndOn)return;
+  const f=VOICE[b.v+'|'+b.i];if(!f)return;
+  const a=vCache[f]||(vCache[f]=new Audio('audio/'+f));
+  vNow=a;try{a.currentTime=0}catch(e){}
+  const pr=a.play();if(pr&&pr.catch)pr.catch(()=>{});
+}
 function show(i){
   gen++;const g=gen;anims.forEach(a=>a.cancel());anims=[];clearTimeout(nextT);$('streams').innerHTML='';
-  cur=Math.max(0,Math.min(B.length-1,i));const b=B[cur],pv=B[cur-1];
+  cur=Math.max(0,Math.min(B.length-1,i));const b=B[cur],pv=B[cur-1];speak(b);
   const inStep=B.filter(x=>x.s===b.s),k=inStep.indexOf(b)+1;
   $('verb').textContent=b.v;$('item').innerHTML=b.a?`${b.i}<span class="amt">${b.a}</span>`:b.i;$('detail').textContent=b.a?'':b.d;$('tip').textContent=b.t||'';
   $('fill').style.width=(k/inStep.length*100)+'%';$('frac').textContent=`${k} / ${inStep.length}`;
