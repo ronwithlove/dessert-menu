@@ -83,6 +83,13 @@ h1{margin:0;text-align:center;font-size:clamp(32px,7vw,50px);line-height:1.1}
 .cl li.ok .nm,.cl li.ok .am{color:var(--soft);text-decoration:line-through}
 .notes{margin:12px 0 0;padding:16px 18px 16px 44px;background:var(--pinkL);border-radius:12px;font-size:19px;line-height:1.65}
 .notes li+li{margin-top:10px}.notes b{color:var(--pink)}
+.mtools{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+.tbtn{font:inherit;font-size:16px;min-height:44px;min-width:44px;padding:0 16px;border-radius:999px;border:2px solid var(--choc);background:var(--card);color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--pinkL)}
+.tbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--pinkL)}
+.tbtn:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.tbtn[aria-pressed="false"]{color:var(--soft);background:var(--bg)}
+.sndFab{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));z-index:5;padding:0;width:48px;height:48px;font-size:22px}
+body:has(#menu:not([hidden])) .sndFab{display:none}
 .menu{display:grid;gap:18px;margin:28px auto 0;max-width:560px}
 .mcard{display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--card);border:2.5px solid var(--choc);border-radius:14px;box-shadow:6px 6px 0 var(--pinkL);color:var(--ink);text-decoration:none;-webkit-tap-highlight-color:transparent}
 .mcard:active{transform:translate(3px,3px);box-shadow:3px 3px 0 var(--pinkL)}
@@ -130,9 +137,11 @@ h1{margin:0;text-align:center;font-size:clamp(32px,7vw,50px);line-height:1.1}
 </head>
 <body>
 <canvas id="confetti" aria-hidden="true"></canvas>
+<button type="button" class="tbtn sndBtn sndFab" aria-label="声音开关" aria-pressed="true">🔊</button>
 <div class="wrap">
   <section id="menu" hidden>
-    <h1 class="disp">甜点菜单</h1>
+    <div class="mtools"><button type="button" class="tbtn" id="fsBtn" hidden>⛶ 全屏</button><button type="button" class="tbtn sndBtn" aria-pressed="true">🔊 声音：开</button></div>
+    <h1 class="disp">Ron 的食谱</h1>
     <div class="tag">选一个开始做</div>
     <div class="menu">
       <a class="mcard" href="#cake">
@@ -141,7 +150,7 @@ h1{margin:0;text-align:center;font-size:clamp(32px,7vw,50px);line-height:1.1}
       </a>
       <a class="mcard" href="#cookie">
         <svg viewBox="0 0 120 100" aria-hidden="true"><ellipse cx="60" cy="58" rx="46" ry="34" fill="#D9A15E" stroke="#3B2418" stroke-width="3"/><ellipse cx="56" cy="54" rx="30" ry="20" fill="#E8BB78"/><rect x="38" y="44" width="11" height="11" rx="2" fill="#2A170E" transform="rotate(14 43 49)"/><rect x="66" y="40" width="12" height="12" rx="2" fill="#2A170E" transform="rotate(-10 72 46)"/><rect x="56" y="66" width="10" height="10" rx="2" fill="#2A170E" transform="rotate(25 61 71)"/><rect x="80" y="62" width="8" height="8" rx="2" fill="#2A170E"/><path d="M30 70 q8 4 14 0M74 30 q6 4 12 2" stroke="#B57A3E" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
-        <div><div class="mt">Costco口味巧克力Cookie</div><div class="ms">空气炸锅 · 2–8 块</div></div><span class="ma">›</span>
+        <div><div class="mt">巧克力 Cookie</div><div class="ms">空气炸锅 · 2–8 块</div></div><span class="ma">›</span>
       </a>
     </div>
     <p class="more">更多甜点，敬请期待</p>
@@ -309,7 +318,7 @@ const RECIPES={
    '想要表面有烘烤感，可以放进空气炸锅，160 °C 再加热 2–4 分钟，注意观察，避免变干。','鸡蛋、糖、牛奶搅匀即可，不需要打发；加干粉后拌到没有干粉就停，别过度搅拌。']
  },
  cookie:{
-  title:'Costco口味巧克力Cookie',unit:'块',opts:[2,4,6,8],def:4,key:'ckN',ckKey:'ckCk',vessel:'bowl',streamEnd:178,
+  title:'巧克力 Cookie',unit:'块',opts:[2,4,6,8],def:4,key:'ckN',ckKey:'ckCk',vessel:'bowl',streamEnd:178,
   tagline:n=>`${n} 块 · 空气炸锅`,
   srvL:'做几块？',srvH:'在饼干上点一下或左右滑动选块数。原配方是 4 块，用量会自动换算。',
   base:{flour:100,starch:5,butter:55,bsugar:35,sugar:20,egg:25,soda:1,salt:.5,chips:50,vanilla:.25},
@@ -574,6 +583,7 @@ async function pour(b,g){
 /* ---------- voice (Breeze 女声，每步读「红字动作 + 黑字食材」，不读克数) ---------- */
 const VOICE={"打入|鸡蛋":"v01.mp3","倒入|白糖":"v02.mp3","倒入|牛奶":"v03.mp3","搅拌|搅匀":"v04.mp3","倒入|普通面粉":"v05.mp3","倒入|玉米淀粉":"v06.mp3","倒入|无糖可可粉":"v07.mp3","倒入|泡打粉":"v08.mp3","搅拌|拌到没有干粉":"v09.mp3","倒入|巧克力碎块":"v10.mp3","轻拌|稍微拌几下":"v11.mp3","检查|不超过半杯":"v12.mp3","加热|这一杯":"v13.mp3","补时|中心没凝固？":"v14.mp3","烘烤|空气炸锅（可选）":"v15.mp3","完成|开吃！":"v16.mp3","分装|2 个杯子":"v17.mp3","检查|每杯不超过一半":"v18.mp3","加热|每杯单独":"v19.mp3","分装|3 个杯子":"v20.mp3","分装|4 个杯子":"v21.mp3","分装|5 个杯子":"v22.mp3","分装|6 个杯子":"v23.mp3","分装|7 个杯子":"v24.mp3","分装|8 个杯子":"v25.mp3","加入|软化黄油":"v26.mp3","加入|红糖":"v27.mp3","加入|白糖":"v28.mp3","搅拌|1–2 分钟":"v29.mp3","加入|鸡蛋":"v30.mp3","加入|香草精（可选）":"v31.mp3","加入|普通面粉":"v32.mp3","加入|玉米淀粉":"v33.mp3","加入|小苏打":"v34.mp3","加入|盐":"v35.mp3","加入|巧克力碎块":"v36.mp3","冷藏|盖好放冰箱":"v37.mp3","分份|分成 2 份":"v38.mp3","整形|搓圆再压成厚饼":"v39.mp3","预热|空气炸锅 320°F":"v40.mp3","烘烤|间隔摆放":"v41.mp3","出炉|边缘定型、中心略软":"v42.mp3","分份|分成 4 份":"v43.mp3","分份|分成 6 份":"v44.mp3","分份|分成 8 份":"v45.mp3"};
 let vNow=null;const vCache={};
+function stopVoice(){try{if(vNow){vNow.pause();vNow.currentTime=0}}catch(e){}vNow=null}
 function speak(b){
   try{if(vNow){vNow.pause();vNow.currentTime=0}}catch(e){}
   vNow=null;if(!sndOn)return;
@@ -614,7 +624,7 @@ const stg=document.querySelector('.stage');
 stg.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
 stg.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)manual(dx<0?1:-1)});
 /* ---------- sound (Web Audio, synthesized) ---------- */
-let AC=null,sndOn=true,live=[];
+let AC=null,sndOn=true,live=[];try{sndOn=localStorage.getItem("dmSnd")!=="0"}catch(e){}
 const ac=()=>{if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==='suspended')AC.resume();return AC};
 const noiseBuf=()=>{const a=AC,b=a.createBuffer(1,a.sampleRate*2,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b};
 let NB=null;
@@ -633,13 +643,25 @@ function tone(t,f,dur,{type='sine',vol=.2,to=null,keep=false}={}){
 }
 function stopSnd(){live.forEach(n=>{try{n.stop()}catch(e){}});live=[]}
 function sfx(k){
-  if(k!=='click')return;const a=AC;if(!a||a.state!=='running')return;const t=a.currentTime+.01;
+  if(k!=='click'||!sndOn)return;const a=AC;if(!a||a.state!=='running')return;const t=a.currentTime+.01;
   if(k==='click'){tone(t,880,.06,{type:'triangle',vol:.12,keep:true});return}
 
 }
 addEventListener('pointerdown',()=>{ac()},{capture:true});
 addEventListener('click',e=>{if(e.target.closest('button,a,#cupBar')&&!e.target.closest('.card')){ac();sfx('click')}});
 
+/* ---------- 声音开关 / 全屏 ---------- */
+function paintSnd(){document.querySelectorAll('.sndBtn').forEach(b=>{b.setAttribute('aria-pressed',sndOn);b.textContent=b.classList.contains('sndFab')?(sndOn?'🔊':'🔇'):(sndOn?'🔊 声音：开':'🔇 声音：关')})}
+function setSnd(on){sndOn=on;try{localStorage.setItem('dmSnd',on?'1':'0')}catch(e){}if(!on){stopVoice();stopSnd()}paintSnd()}
+document.querySelectorAll('.sndBtn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();setSnd(!sndOn)}));
+paintSnd();
+const FSE=document.documentElement,fsReq=FSE.requestFullscreen||FSE.webkitRequestFullscreen,
+  fsExit=document.exitFullscreen||document.webkitExitFullscreen,isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+const fsBtn=$('fsBtn');
+if(fsReq&&fsExit){fsBtn.hidden=false;
+  const paintFS=()=>{fsBtn.textContent=isFS()?'⛶ 退出全屏':'⛶ 全屏'};paintFS();
+  fsBtn.addEventListener('click',()=>{try{const r=isFS()?fsExit.call(document):fsReq.call(FSE);if(r&&r.catch)r.catch(()=>{})}catch(e){}});
+  document.addEventListener('fullscreenchange',paintFS);document.addEventListener('webkitfullscreenchange',paintFS)}
 /* ---------- confetti ---------- */
 const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],raf=null;
 function confetti(){
@@ -694,7 +716,7 @@ function switchRecipe(id){RID=id;R=RECIPES[id];N=loadN();loadCk();buildBar();app
 let firstView=true;
 function route(){
   let h=location.hash.slice(1);if(h==='checklist')h='cake-list';
-  if(!h||h==='menu'){stopAnim();$('menu').hidden=false;$('recipe').hidden=true;document.title='甜点菜单';scrollTo(0,0);return}
+  if(!h||h==='menu'){stopAnim();$('menu').hidden=false;$('recipe').hidden=true;document.title='Ron 的食谱';stopVoice();scrollTo(0,0);return}
   const [rid,sub]=h.split('-');if(!RECIPES[rid]){location.hash='';return}
   $('menu').hidden=true;$('recipe').hidden=false;
   let fresh=false;if(rid!==RID||firstView){switchRecipe(rid);fresh=true}
