@@ -268,7 +268,7 @@ body:has(#menu:not([hidden])) .sndFab{display:none}
     <div class="srv">
       <div class="srv-top"><span class="srv-l" id="srvL">做几杯？</span><output id="nOut" data-u="杯">1</output></div>
       <div class="cups" id="cupBar" role="slider" tabindex="0" aria-label="杯数" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1"></div>
-      <div class="sweet"><button type="button" class="sw" id="swBtn" role="switch" aria-checked="false" aria-label="7 分甜"><i></i></button><span class="sw-l">7 分甜</span><span class="sw-n">白糖按 70% 计算</span></div>
+      <div class="sweet"><button type="button" class="sw" id="swBtn" role="switch" aria-checked="false" aria-label="7 分甜"><i></i></button><span class="sw-l">7 分甜</span><span class="sw-n" id="swN">白糖按 70% 计算</span></div>
     </div>
     <p class="srv-h" id="srvH">在杯子上点一下或左右滑动选杯数。一杯是一份，用量会自动换算。</p>
     <div class="cl-head"><h2 class="disp">食材清单</h2><span id="cnt"></span></div>
@@ -307,7 +307,7 @@ const ART={
 const FR={0.125:'⅛',0.25:'¼',0.375:'⅜',0.5:'½',0.75:'¾',1:'1'};
 const num=v=>+v.toFixed(2);
 let SW=false;try{SW=localStorage.getItem('dmSweet')==='1'}catch(e){}
-const SWf=k=>k==='sugar'&&SW?.7:1; /* 7 分甜：白糖 ×70% */
+const SWf=k=>(k==='sugar'||k==='bsugar')&&SW?.7:1; /* 7 分甜：白糖、红糖 ×70% */
 const RECIPES={
  cake:{
   title:'巧克力杯子蛋糕',unit:'杯',opts:[1,2,3,4,5,6,7,8],def:1,key:'mugN',ckKey:'mugCk',vessel:'cup',streamEnd:140,
@@ -709,7 +709,7 @@ function buildBar(){bar.style.gridTemplateColumns=`repeat(${R.opts.length},minma
 const paintBar=()=>{[...bar.children].forEach((c,k)=>c.classList.toggle('on',R.opts[k]<=N));bar.setAttribute('aria-valuenow',N);bar.setAttribute('aria-valuetext',N+' '+R.unit)};
 function applyN(){build();buildShelf();buildCups();$('rTitle').textContent=R.title;document.title=R.title;
   $('tagline').textContent=R.tagline(N);$('nOut').textContent=N;$('nOut').dataset.u=R.unit;$('srvL').textContent=R.srvL;$('srvH').textContent=R.srvH;
-  renderCl();paintBar()}
+  renderCl();paintBar();$('swN').textContent=RID==='cookie'?'白糖、红糖按 70% 计算':'白糖按 70% 计算'}
 const setN=v=>{if(!R.opts.includes(v)||v===N)return;N=v;try{localStorage.setItem(R.key,N)}catch(e){}applyN();auto=false;cur=0};
 const pick=e=>{const r=bar.getBoundingClientRect(),L=R.opts.length;const i=Math.min(L,Math.max(1,Math.ceil((e.clientX-r.left)/r.width*L)));setN(R.opts[i-1])};
 let drag=false;
